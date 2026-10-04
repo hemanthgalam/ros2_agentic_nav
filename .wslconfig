@@ -1,0 +1,10 @@
+# Place at C:\Users\<you>\.wslconfig (Windows side) and restart WSL
+# (`wsl --shutdown` from PowerShell) for changes to take effect.
+#
+# Sized for running Gazebo + Nav2 + slam_toolbox + a Next.js dev server
+# concurrently. Tune memory/processors down to match your host.
+[wsl2]
+memory=8GB
+processors=4
+swap=4GB
+localhostForwarding=true

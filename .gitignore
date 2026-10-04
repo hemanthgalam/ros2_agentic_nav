@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+backend/.env
+
+# docker compose .env (GEMINI_API_KEY substitution)
+.env
+
+# Node / Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local
+
+# ROS 2
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+
+# start.sh runtime logs
+.run/
+
+# OS
+.DS_Store
+
+# Vendored (built-from-source) rosbridge_suite - apt package wasn't installable without sudo
+ros2_ws/src/rosbridge_suite/
+frontend/tsconfig.tsbuildinfo

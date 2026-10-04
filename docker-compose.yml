@@ -1,0 +1,53 @@
+# Containerized deployment path.
+#
+# Networking: services talk to each other over the default compose bridge
+# network by service name (backend -> ros2:9090). rosbridge's port is also
+# published to the host because the *browser* connects to it directly for
+# telemetry (see docs/ARCHITECTURE.md) — it isn't proxied through the backend.
+#
+# Note: this was authored and syntax/structure-reviewed in an environment
+# without Docker Desktop's WSL2 integration enabled, so `docker compose build/up`
+# itself could not be run here — see README.md §4 for what to check if it
+# doesn't come up cleanly on your machine. The equivalent native (non-Docker)
+# bring-up in README.md §1-3 *was* fully verified end-to-end.
+services:
+  ros2:
+    build:
+      context: ./ros2_ws
+      dockerfile: Dockerfile
+    ports:
+      - "9090:9090"
+    environment:
+      - TURTLEBOT3_MODEL=waffle
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    depends_on:
+      - ros2
+    ports:
+      - "8000:8000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY:?Set GEMINI_API_KEY in a .env file next to docker-compose.yml, or in the shell environment}
+      - GEMINI_MODEL=${GEMINI_MODEL:-gemini-flash-latest}
+      - ROSBRIDGE_HOST=ros2
+      - ROSBRIDGE_PORT=9090
+      - CORS_ORIGINS=http://localhost:3000
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Baked into the client bundle at build time (see Dockerfile) — must
+        # be host-reachable (the browser connects directly), not the internal
+        # service name.
+        - NEXT_PUBLIC_ROSBRIDGE_URL=ws://localhost:9090
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    environment:
+      # Server-side only (Next.js API routes -> backend): internal service DNS.
+      - BACKEND_URL=http://backend:8000

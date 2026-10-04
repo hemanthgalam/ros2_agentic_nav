@@ -1,0 +1,7 @@
+build/
+install/
+log/
+# apt installs ros-humble-rosbridge-suite in the image (see Dockerfile);
+# the local checkout may have a from-source vendored copy (see repo .gitignore)
+# for environments where the apt package wasn't installable.
+src/rosbridge_suite/
